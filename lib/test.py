@@ -92,7 +92,8 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
 
       if config.normalize_color:
         input[:, :3] = input[:, :3] / 255. - 0.5
-      sinput = ME.SparseTensor(input, coords).to(device)
+      # sinput = ME.SparseTensor(input, coords).to(device)
+      sinput = ME.SparseTensor(input, coords, device=device)
 
       # Feed forward
       inputs = (sinput,)

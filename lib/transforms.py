@@ -47,7 +47,8 @@ class RandomHorizontalFlip(object):
     if random.random() < 0.95:
       for curr_ax in self.horz_axes:
         if random.random() < 0.5:
-          coord_max = np.max(coords[:, curr_ax])
+          # coord_max = np.max(coords[:, curr_ax])
+          coord_max = torch.max(coords[:, curr_ax])
           coords[:, curr_ax] = coord_max - coords[:, curr_ax]
     return coords, feats, labels
 
@@ -248,9 +249,12 @@ class cfl_collate_fn_factory:
             f'limit. Truncating batch size at {batch_id} out of {num_full_batch_size} with {batch_num_points - num_points}.'
         )
         break
-      coords_batch.append(torch.from_numpy(coords[batch_id]).int())
-      feats_batch.append(torch.from_numpy(feats[batch_id]))
+      # coords_batch.append(torch.from_numpy(coords[batch_id]).int())
+      # feats_batch.append(torch.from_numpy(feats[batch_id]))
       labels_batch.append(torch.from_numpy(labels[batch_id]).int())
+      coords_batch.append(coords[batch_id].int())
+      feats_batch.append(feats[batch_id])
+      # labels_batch.append(labels[batch_id].int())
 
     # Concatenate all lists
     coords_batch, feats_batch, labels_batch = ME.utils.sparse_collate(coords_batch, feats_batch, labels_batch)

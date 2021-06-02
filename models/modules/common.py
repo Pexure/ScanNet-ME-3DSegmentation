@@ -84,23 +84,24 @@ class ConvType(Enum):
 # Covert the ConvType var to a RegionType var
 conv_to_region_type = {
     # kernel_size = [k, k, k, 1]
-    ConvType.HYPERCUBE: ME.RegionType.HYPERCUBE,
-    ConvType.SPATIAL_HYPERCUBE: ME.RegionType.HYPERCUBE,
-    ConvType.SPATIO_TEMPORAL_HYPERCUBE: ME.RegionType.HYPERCUBE,
-    ConvType.HYPERCROSS: ME.RegionType.HYPERCROSS,
-    ConvType.SPATIAL_HYPERCROSS: ME.RegionType.HYPERCROSS,
-    ConvType.SPATIO_TEMPORAL_HYPERCROSS: ME.RegionType.HYPERCROSS,
-    ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS: ME.RegionType.HYBRID
+    ConvType.HYPERCUBE: ME.RegionType.HYPER_CUBE,
+    ConvType.SPATIAL_HYPERCUBE: ME.RegionType.HYPER_CUBE,
+    ConvType.SPATIO_TEMPORAL_HYPERCUBE: ME.RegionType.HYPER_CUBE,
+    ConvType.HYPERCROSS: ME.RegionType.HYPER_CROSS,
+    ConvType.SPATIAL_HYPERCROSS: ME.RegionType.HYPER_CROSS,
+    ConvType.SPATIO_TEMPORAL_HYPERCROSS: ME.RegionType.HYPER_CROSS,
+    # ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS: ME.RegionType.HYBRID
+    ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS: ME.RegionType.HYPER_CUBE
 }
 
-int_to_region_type = {m.value: m for m in ME.RegionType}
-
-
-def convert_region_type(region_type):
-  """
-  Convert the integer region_type to the corresponding RegionType enum object.
-  """
-  return int_to_region_type[region_type]
+# int_to_region_type = {m.value: m for m in ME.RegionType}
+# 
+# 
+# def convert_region_type(region_type):
+#   """
+#   Convert the integer region_type to the corresponding RegionType enum object.
+#   """
+#   return int_to_region_type[region_type]
 
 
 def convert_conv_type(conv_type, kernel_size, D):
@@ -141,10 +142,10 @@ def convert_conv_type(conv_type, kernel_size, D):
   elif conv_type == ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS:
     # Define the CUBIC conv kernel for spatial dims and CROSS conv for temp dim
     axis_types = [
-        ME.RegionType.HYPERCUBE,
+        ME.RegionType.HYPER_CUBE,
     ] * 3
     if D == 4:
-      axis_types.append(ME.RegionType.HYPERCROSS)
+      axis_types.append(ME.RegionType.HYPER_CROSS)
   return region_type, axis_types, kernel_size
 
 
@@ -158,8 +159,10 @@ def conv(in_planes,
          D=-1):
   assert D > 0, 'Dimension must be a positive integer'
   region_type, axis_types, kernel_size = convert_conv_type(conv_type, kernel_size, D)
+  # kernel_generator = ME.KernelGenerator(
+  #     kernel_size, stride, dilation, region_type=region_type, axis_types=axis_types, dimension=D)
   kernel_generator = ME.KernelGenerator(
-      kernel_size, stride, dilation, region_type=region_type, axis_types=axis_types, dimension=D)
+      kernel_size, stride, dilation, region_type=region_type, axis_types=None, dimension=D)
 
   return ME.MinkowskiConvolution(
       in_channels=in_planes,
@@ -167,7 +170,7 @@ def conv(in_planes,
       kernel_size=kernel_size,
       stride=stride,
       dilation=dilation,
-      has_bias=bias,
+      bias=bias,
       kernel_generator=kernel_generator,
       dimension=D)
 
@@ -196,7 +199,7 @@ def conv_tr(in_planes,
       kernel_size=kernel_size,
       stride=upsample_stride,
       dilation=dilation,
-      has_bias=bias,
+      bias=bias,
       kernel_generator=kernel_generator,
       dimension=D)
 

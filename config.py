@@ -109,6 +109,8 @@ train_arg.add_argument('--val_freq', type=int, default=1000, help='validation fr
 train_arg.add_argument('--train_phase', type=str, default='train', help='Dataset for training')
 train_arg.add_argument('--val_phase', type=str, default='val', help='Dataset for validation')
 train_arg.add_argument(
+    '--empty_cache_freq', type=int, default=1, help='Clear pytorch cache frequency')
+train_arg.add_argument(
     '--overwrite_weights', type=str2bool, default=True, help='Overwrite checkpoint during training')
 train_arg.add_argument(
     '--resume', default=None, type=str, help='path to latest checkpoint (default: none)')
